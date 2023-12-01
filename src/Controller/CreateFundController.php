@@ -2,7 +2,7 @@
 
 namespace App\Controller;
 
-use App\DTO\FundCreationDTO;
+use App\DTO\FundInputDTO;
 use App\Entity\Fund;
 use App\Message\DuplicateFundWarningMessage;
 use App\Repository\FundManagerRepository;
@@ -33,7 +33,7 @@ class CreateFundController extends AbstractController
     public function index(Request $request): JsonResponse
     {
         $requestData = $request->toArray();
-        $dto = new FundCreationDTO(
+        $dto = new FundInputDTO(
             $requestData['name'] ?? '',
             $requestData['startYear'] ?? 0,
             $requestData['managerId'] ?? '',
@@ -53,11 +53,9 @@ class CreateFundController extends AbstractController
         $manager = $this->managerRepository->find($dto->managerId);
 
         $doesFundAlreadyExist = $this->fundRepository->doesFundAlreadyExist($dto->name, $dto->aliases, $manager->id);
-        var_dump($doesFundAlreadyExist);
         if ($doesFundAlreadyExist) {
             $this->dispatcher->dispatch(new DuplicateFundWarningMessage($dto->name, $dto->aliases, $manager->id));
         }
-        exit();
         $fund = new Fund($this->ulidFactory->create(), $dto->name, $dto->startYear, $manager, $dto->aliases);
         $this->fundRepository->add($fund);
 

@@ -81,8 +81,8 @@ class FundRepository extends ServiceEntityRepository
         SELECT COUNT(*) AS count
         FROM fund
         WHERE name = :name
+        AND manager_id::text = :managerId
         OR aliases ??| array[:aliases]
-        OR manager_id::text = :managerId
         SQL;
         $query = $this->getEntityManager()->createNativeQuery($sql, $rsm);
         $query->setParameter('name', $name);

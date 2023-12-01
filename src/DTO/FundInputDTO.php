@@ -7,7 +7,7 @@ namespace App\DTO;
 use App\Entity\Fund;
 use Symfony\Component\Validator\Constraints as Assert;
 
-readonly class FundCreationDTO
+readonly class FundInputDTO
 {
     public function __construct(
         #[Assert\NotBlank]

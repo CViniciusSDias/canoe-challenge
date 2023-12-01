@@ -1,6 +1,6 @@
 version: '3.9'
 services:
-  php:
+  web:
     build: .
     working_dir: /app
     command: ["php", "-S", "0.0.0.0:8000", "-t", "public"]
@@ -8,6 +8,29 @@ services:
       - .:/app
     ports:
       - "8000:8000"
+    depends_on:
+      - database
+      - rabbitmq
+      - migrations
+  consumer:
+    build: .
+    working_dir: /app
+    command: ["php", "bin/console", "messenger:consume", "async", "-vv"]
+    volumes:
+      - .:/app
+    restart: on-failure
+    depends_on:
+      - database
+      - rabbitmq
+  migrations:
+    depends_on:
+      - database
+    build: .
+    working_dir: /app
+    command: ["php", "bin/console", "doctrine:migrations:migrate", "--no-interaction"]
+    restart: on-failure
+    volumes:
+      - .:/app
   database:
     image: postgres:16
     environment:

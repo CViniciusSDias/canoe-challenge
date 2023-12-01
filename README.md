@@ -41,3 +41,9 @@ Unfortunately, I only had tonight (Thursday) after work to work on this project.
 - OpenTelemetry for observability;
 
 But I believe that the current state of the project is a good start to show my skills and how I would approach a project. I am open to answer any questions that may come up, and I would also love to hear any feedback one may have.
+
+### Non-implementation of Company entity
+
+Since the only "required" endpoints were related to Funds and I had very limited time, I decided to not implement the Company entity, but the following [ER diagram](https://dbdiagram.io/d/656965c03be14957871962f5) contains the modeling of the ManyToMany relationship. 
+
+![ER Diagram](./er-diagram.png)

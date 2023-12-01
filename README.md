@@ -39,6 +39,7 @@ Unfortunately, I only had tonight (Thursday) after work to work on this project.
 - Better organization using Clean Architecture (creating UseCases, interfaces for the repositories, etc);
 - External logging tool;
 - OpenTelemetry for observability;
+- More thorough documentation;
 
 But I believe that the current state of the project is a good start to show my skills and how I would approach a project. I am open to answer any questions that may come up, and I would also love to hear any feedback one may have.
 

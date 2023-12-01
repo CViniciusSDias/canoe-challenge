@@ -1,0 +1,234 @@
+openapi: 3.0.3
+info:
+  title: Canoe Challenge
+  version: "1"
+externalDocs:
+  description: Github Repository
+  url: https://github.com/CViniciusSDias/canoe-challenge
+servers:
+  - url: http://localhost:8000/
+paths:
+  /funds:
+    post:
+      tags:
+        - Funds
+      summary: Add a new Fund
+      requestBody:
+        description: Create a new Fund
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FundInput'
+        required: true
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Fund'
+        '422':
+          description: Validation exception
+    get:
+      tags:
+        - Funds
+      summary: List all funds
+      parameters:
+        - name: name
+          in: query
+          description: Name of the funds to search
+          required: false
+          schema:
+            type: string
+        - name: startYear
+          in: query
+          description: Start year of the funds to search
+          required: false
+          schema:
+            type: integer
+            example: 2023
+        - name: managerId
+          in: query
+          description: ID of the manager of the funds to search
+          required: false
+          schema:
+            type: string
+            format: ulid
+        - name: alias
+          in: query
+          description: One of the aliases of the funds to search
+          required: false
+          schema:
+            type: string
+        - name: limit
+          in: query
+          description: Number of results to display
+          required: false
+          schema:
+            type: integer
+        - name: offset
+          in: query
+          description: From where to start the pagination
+          required: false
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Fund'
+        '400':
+          description: Invalid query parameters
+  /funds/{id}:
+    put:
+      tags:
+        - Funds
+      summary: Update an existing Fund
+      parameters:
+        - name: id
+          in: path
+          description: ID of fund to update
+          required: true
+          schema:
+            type: string
+            format: ulid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FundInput'
+        required: true
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Fund'
+        '404':
+          description: Fund not found
+        '422':
+          description: Validation exception
+  /managers:
+    get:
+      tags:
+        - Managers
+      summary: List all managers
+      parameters:
+        - name: offset
+          in: query
+          description: From where to start the pagination (with 10 items per page)
+          required: false
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Manager'
+        '400':
+          description: Invalid query parameters
+    post:
+      tags:
+        - Managers
+      summary: Add a new Manager
+      requestBody:
+        description: Create a new manager
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                companyName:
+                  type: string
+                  example: "Manager name"
+        required: true
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Manager'
+        '422':
+          description: Validation exception
+components:
+  schemas:
+    Fund:
+      required:
+        - id
+        - name
+        - startYear
+        - manager
+        - aliases
+      type: object
+      properties:
+        id:
+          type: string
+          format: ulid
+          example: "01ARZ3NDEKTSV4RRFFQ69G5FAV"
+        name:
+          type: string
+          example: "Example Fund"
+        startYear:
+          type: integer
+          example: 2023
+        manager:
+          type: object
+          properties:
+            id:
+              type: string
+              format: ulid
+              example: "01ARZ3NDEKTSV4RRFFQ69G5FAV"
+            companyName:
+              type: string
+              example: "Manager name"
+        aliases:
+          type: array
+          items:
+            type: string
+            example: example_alias
+    FundInput:
+      required:
+        - name
+        - startYear
+        - managerId
+        - aliases
+      type: object
+      properties:
+        name:
+          type: string
+          example: "Example Fund"
+        startYear:
+          type: integer
+          example: 2023
+        managerId:
+          type: string
+          format: ulid
+          example: "01ARZ3NDEKTSV4RRFFQ69G5FAV"
+        aliases:
+          type: array
+          items:
+            type: string
+            example: example_alias
+    Manager:
+      required:
+        - id
+        - companyName
+      type: object
+      properties:
+        id:
+          type: string
+          format: ulid
+          example: "01ARZ3NDEKTSV4RRFFQ69G5FAV"
+        companyName:
+          type: string
+          example: "Manager name"

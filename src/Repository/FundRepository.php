@@ -1,0 +1,94 @@
+<?php
+
+namespace App\Repository;
+
+use App\Entity\Fund;
+use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\Query\ResultSetMapping;
+use Doctrine\ORM\Query\ResultSetMappingBuilder;
+use Doctrine\Persistence\ManagerRegistry;
+
+/**
+ * @extends ServiceEntityRepository<Fund>
+ *
+ * @method Fund|null find($id, $lockMode = null, $lockVersion = null)
+ * @method Fund|null findOneBy(array $criteria, array $orderBy = null)
+ * @method Fund[]    findAll()
+ */
+class FundRepository extends ServiceEntityRepository
+{
+    public function __construct(ManagerRegistry $registry)
+    {
+        parent::__construct($registry, Fund::class);
+    }
+
+    public function add(Fund $fund): void
+    {
+        $entityManager = $this->getEntityManager();
+
+        $entityManager->persist($fund);
+        $entityManager->flush();
+    }
+
+    /**
+     * @return Fund[]
+     */
+    public function findBy(array $criteria, ?array $orderBy = null, $limit = null, $offset = null): array
+    {
+        $rsm = new ResultSetMappingBuilder($this->getEntityManager());
+        $rsm->addRootEntityFromClassMetadata(Fund::class, 'fund');
+
+        $sql = <<<SQL
+        SELECT id, name, start_year, manager_id, aliases
+        FROM fund
+        WHERE 1 = 1
+        SQL;
+
+        $parameters = [];
+
+        if (isset($criteria['name'])) {
+            $sql .= ' AND name = :name';
+            $parameters['name'] = $criteria['name'];
+        }
+
+        if (isset($criteria['startYear'])) {
+            $sql .= ' AND start_year = :startYear';
+            $parameters['startYear'] = $criteria['startYear'];
+        }
+
+        if (isset($criteria['managerId'])) {
+            $sql .= ' AND manager_id = :managerId';
+            $parameters['managerId'] = $criteria['managerId'];
+        }
+
+        if (isset($criteria['alias'])) {
+            $sql .= ' AND aliases ?? :alias';
+            $parameters['alias'] = $criteria['alias'];
+        }
+
+        $query = $this->getEntityManager()->createNativeQuery($sql, $rsm);
+        $query->setParameters($parameters);
+
+        return $query->getResult();
+    }
+
+    public function doesFundAlreadyExist(string $name, array $aliases, ?string $managerId): bool
+    {
+        $rsm = new ResultSetMappingBuilder($this->getEntityManager());
+        $rsm->addScalarResult('count', 'count');
+
+        $sql = <<<SQL
+        SELECT COUNT(*) AS count
+        FROM fund
+        WHERE name = :name
+        OR aliases ??| array[:aliases]
+        OR manager_id::text = :managerId
+        SQL;
+        $query = $this->getEntityManager()->createNativeQuery($sql, $rsm);
+        $query->setParameter('name', $name);
+        $query->setParameter('aliases', $aliases);
+        $query->setParameter('managerId', $managerId);
+
+        return $query->getSingleScalarResult() > 0;
+    }
+}

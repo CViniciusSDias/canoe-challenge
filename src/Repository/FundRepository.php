@@ -4,9 +4,9 @@ namespace App\Repository;
 
 use App\Entity\Fund;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
-use Doctrine\ORM\Query\ResultSetMapping;
 use Doctrine\ORM\Query\ResultSetMappingBuilder;
 use Doctrine\Persistence\ManagerRegistry;
+use Override;
 
 /**
  * @extends ServiceEntityRepository<Fund>
@@ -33,7 +33,8 @@ class FundRepository extends ServiceEntityRepository
     /**
      * @return Fund[]
      */
-    public function findBy(array $criteria, ?array $orderBy = null, $limit = null, $offset = null): array
+    #[Override]
+    public function findBy(array $criteria, ?array $orderBy = null, $limit = 10, $offset = 0): array
     {
         $rsm = new ResultSetMappingBuilder($this->getEntityManager());
         $rsm->addRootEntityFromClassMetadata(Fund::class, 'fund');
@@ -65,6 +66,10 @@ class FundRepository extends ServiceEntityRepository
             $sql .= ' AND aliases ?? :alias';
             $parameters['alias'] = $criteria['alias'];
         }
+
+        $sql .= ' LIMIT :limit OFFSET :offset';
+        $parameters['limit'] = $limit;
+        $parameters['offset'] = $offset;
 
         $query = $this->getEntityManager()->createNativeQuery($sql, $rsm);
         $query->setParameters($parameters);

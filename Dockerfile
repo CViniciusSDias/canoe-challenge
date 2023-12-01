@@ -7,3 +7,5 @@ RUN pecl install swoole && docker-php-ext-enable swoole
 RUN apt update && apt install -y zip unzip
 
 RUN apt install -y libpq-dev && docker-php-ext-install pdo_pgsql
+
+RUN apt install -y librabbitmq-dev && pecl install amqp && docker-php-ext-enable amqp

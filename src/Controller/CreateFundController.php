@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\DTO\FundCreationDTO;
 use App\Entity\Fund;
+use App\Message\DuplicateFundWarningMessage;
 use App\Repository\FundManagerRepository;
 use App\Repository\FundRepository;
 use Symfony\Bridge\Doctrine\IdGenerator\UlidGenerator;
@@ -12,6 +13,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
+use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Uid\Factory\UlidFactory;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
@@ -22,7 +24,8 @@ class CreateFundController extends AbstractController
         private FundRepository $fundRepository,
         private FundManagerRepository $managerRepository,
         private ValidatorInterface $validator,
-        private UlidFactory $ulidFactory
+        private UlidFactory $ulidFactory,
+        private MessageBusInterface $dispatcher
     ) {
     }
 
@@ -49,7 +52,12 @@ class CreateFundController extends AbstractController
 
         $manager = $this->managerRepository->find($dto->managerId);
 
-        $this->fundRepository->doesFundAlreadyExist($dto->name, $dto->aliases, $manager->id);
+        $doesFundAlreadyExist = $this->fundRepository->doesFundAlreadyExist($dto->name, $dto->aliases, $manager->id);
+        var_dump($doesFundAlreadyExist);
+        if ($doesFundAlreadyExist) {
+            $this->dispatcher->dispatch(new DuplicateFundWarningMessage($dto->name, $dto->aliases, $manager->id));
+        }
+        exit();
         $fund = new Fund($this->ulidFactory->create(), $dto->name, $dto->startYear, $manager, $dto->aliases);
         $this->fundRepository->add($fund);
 

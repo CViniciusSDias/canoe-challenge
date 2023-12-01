@@ -26,7 +26,13 @@ This image will be used for three different tasks:
 
 Besides this PHP image, the project also uses PostgreSQL and RabbitMQ.
 
-To see a documentation of the API, you can load the `openapi.yaml` file in [Swagger Editor](https://editor.swagger.io/). You can also import this `openapi.yaml` file to tools such as _Postman_ or _Insomnia_ to perform the requests. 
+To see a documentation of the API, you can load the `openapi.yaml` file in [Swagger Editor](https://editor.swagger.io/). You can also import this `openapi.yaml` file to tools such as _Postman_ or _Insomnia_ to perform the requests.
+
+To see the message of duplicate fund being handled, you can execute:
+
+```bash
+docker compose logs -f consumer
+```
 
 ## Explanations
 

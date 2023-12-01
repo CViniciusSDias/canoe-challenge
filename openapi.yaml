@@ -6,7 +6,7 @@ externalDocs:
   description: Github Repository
   url: https://github.com/CViniciusSDias/canoe-challenge
 servers:
-  - url: http://localhost:8000/
+  - url: http://localhost:8000
 paths:
   /funds:
     post:

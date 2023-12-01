@@ -1,5 +1,11 @@
 version: '3.9'
 services:
+  composer:
+    build: .
+    working_dir: /app
+    command: ["composer", "install", "--no-progress", "--no-interaction"]
+    volumes:
+      - .:/app
   web:
     build: .
     working_dir: /app
